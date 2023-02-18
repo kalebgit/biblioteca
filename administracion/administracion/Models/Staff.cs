@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace administracion.Models
 {
-    internal class Staff : Handler<Staff>
+    public class Staff
     {
         public long Id { get; set; }
         public string Nombre { get; set; }
@@ -23,25 +23,9 @@ namespace administracion.Models
             Turno = turno;
         }
 
-        public override string GetTabla()
+        public override string ToString()
         {
-            return "STAFF";
-        }
-        public override object CreateObject(SqlDataReader dataReader)
-        {
-            Staff staff = new Staff(dataReader.GetInt64(0), dataReader.GetString(1), 
-                dataReader.GetString(2), dataReader.GetString(3));
-            return staff;
-        }
-        public override Dictionary<string, object> GetKeyValuePairs()
-        {
-            return new Dictionary<string, object>()
-            {
-                { "ID_STAFF", Id },
-                {"NOMBRE", Nombre },
-                {"APELLIDO", Apellido },
-                {"TURNO", Turno }
-            };
+            return String.Format("{0,-25}{1,-30}{2,-30}{3,-25}", Id, Nombre, Apellido, Turno);
         }
     }
 }

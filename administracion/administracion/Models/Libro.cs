@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace administracion.Models
 {
-    internal class Libro : Handler<Libro>
+    public class Libro
     {
         public long Id { get; set; }
         public string Titulo { get; set; }
@@ -30,40 +30,10 @@ namespace administracion.Models
             Cantidad = cantidad;
         }
 
-        public override string GetTabla()
+        public override string ToString()
         {
-            return "LIBRO";
-        }
-        public override object CreateObject(SqlDataReader dataReader)
-        {
-            Libro libro = new Libro(dataReader.GetInt64(0), dataReader.GetString(1), 
-                dataReader.GetString(2), dataReader.GetString(3), dataReader.GetString(4),
-                dataReader.GetString(5), dataReader.GetInt32(6));
-            return libro;
-        }
-        public override List<object> CreateObjects(SqlDataReader dataReader)
-        {
-            List<object> libros = new List<object>();
-            while (dataReader.Read())
-            {
-                libros.Add(new Libro(dataReader.GetInt64(0), dataReader.GetString(1),
-                dataReader.GetString(2), dataReader.GetString(3), dataReader.GetString(4),
-                dataReader.GetString(5), dataReader.GetInt32(6)));
-            }
-            return libros;
-        }
-        public override Dictionary<string, object> GetKeyValuePairs()
-        {
-            return new Dictionary<string, object>()
-            {
-                { "ID_USUARIO", Id },
-                {"TITULO", Titulo },
-                {"NOMBR_EAUTOR", NombreAutor },
-                {"APELLIDO_AUTOR", ApellidoAutor },
-                {"EDITORIAL", Editorial},
-                {"SECCION", Seccion},
-                {"CANTIDAD", Cantidad }
-            };
+            return String.Format("{0,-25}{1,-50}{2,-30}{3,-30}{4,-30}{5,-30}{6,-20}",
+                Id, Titulo, NombreAutor, ApellidoAutor, Editorial, Seccion, Cantidad);
         }
     }
 }

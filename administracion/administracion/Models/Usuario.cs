@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace administracion.Models
 {
-    internal class Usuario : Handler<Usuario>
+    public class Usuario
     {
         public long Id { get; set; }
         public string Nombre { get; set; }
@@ -28,39 +28,11 @@ namespace administracion.Models
             Telefono = telefono;
         }
 
-        public override string GetTabla()
+        public override string ToString()
         {
-            return "USUARIO";
+            return String.Format("{0,-25}{1,-30}{2,-30}{3,-10}{4,-30}{5,-30}", Id,
+                Nombre, Apellido, Edad, Mail, Telefono);
         }
-        public override object CreateObject(SqlDataReader dataReader)
-        {
-            Usuario usuario = new Usuario(dataReader.GetInt64(0), dataReader.GetString(1),
-                dataReader.GetString(2), dataReader.GetInt32(3), dataReader.GetString(4),
-                dataReader.GetInt64(5));
-            return usuario;
-        }
-        public override List<object> CreateObjects(SqlDataReader dataReader)
-        {
-            List<object> usuarios = new List<object>();
-            while (dataReader.Read())
-            {
-                usuarios.Add(new Usuario(dataReader.GetInt64(0), dataReader.GetString(1),
-                dataReader.GetString(2), dataReader.GetInt32(3), dataReader.GetString(4),
-                dataReader.GetInt64(5)));
-            }
-            return usuarios;
-        }
-        public override Dictionary<string, object> GetKeyValuePairs()
-        {
-            return new Dictionary<string, object>()
-            {
-                { "ID_USUARIO", Id },
-                {"NOMBRE", Nombre },
-                {"APELLIDO", Apellido },
-                {"EDAD", Edad },
-                {"EMAIL", Mail },
-                {"TELEFONO", Telefono }
-            };
-        }
+
     }
 }
