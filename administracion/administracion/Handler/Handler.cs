@@ -31,11 +31,15 @@ namespace administracion.Handler
                 for (int i = 0; i < GetKeyValuePairs(obj).Count; i++)
                 {
                     valores += i == GetKeyValuePairs(obj).Count - 1 ?
-                        $"{GetKeyValuePairs(obj).ElementAt(i).Value}" :
-                        $"{GetKeyValuePairs(obj).ElementAt(i).Value},";
+                            (GetKeyValuePairs(obj).ElementAt(i).Value is string ?
+                            $"'{GetKeyValuePairs(obj).ElementAt(i).Value}'" :
+                        $"{GetKeyValuePairs(obj).ElementAt(i).Value}") :
+                        (GetKeyValuePairs(obj).ElementAt(i).Value is string ?
+                            $"'{GetKeyValuePairs(obj).ElementAt(i).Value}', " :
+                            $"{GetKeyValuePairs(obj).ElementAt(i).Value}, ");
                 }
 
-                SqlCommand command = new SqlCommand($"INSERTO INTO {GetTabla()}" +
+                SqlCommand command = new SqlCommand($"INSERT INTO {GetTabla()}" +
                     $" VALUES ({valores})", connection);
 
                 command.ExecuteNonQuery();
@@ -53,15 +57,19 @@ namespace administracion.Handler
                     valores += "(";
                     for (int i = 0; i < GetKeyValuePairs(obj).Count; i++)
                     {
-                        valores += i == GetKeyValuePairs(obj).Count - 1 ?
-                            $"{GetKeyValuePairs(obj).ElementAt(i).Value}" :
-                            $"{GetKeyValuePairs(obj).ElementAt(i).Value},";
+                        valores += i == GetKeyValuePairs(obj).Count - 1 ? 
+                            (GetKeyValuePairs(obj).ElementAt(i).Value is string ?
+                            $"'{GetKeyValuePairs(obj).ElementAt(i).Value}'" :
+                        $"{GetKeyValuePairs(obj).ElementAt(i).Value}") :
+                        (GetKeyValuePairs(obj).ElementAt(i).Value is string ?
+                            $"'{GetKeyValuePairs(obj).ElementAt(i).Value}', " :
+                            $"{GetKeyValuePairs(obj).ElementAt(i).Value}, ");
                     }
                     valores += y == lista.Count - 1 ? ") " : "), ";
                 }
 
 
-                SqlCommand command = new SqlCommand($"INSERTO INTO {GetTabla()}" +
+                SqlCommand command = new SqlCommand($"INSERT INTO {GetTabla()}" +
                     $" VALUES {valores}", connection);
 
                 command.ExecuteNonQuery();

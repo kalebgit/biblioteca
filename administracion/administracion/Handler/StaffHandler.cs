@@ -46,12 +46,20 @@ namespace administracion.Handler
             string texto = String.Format("=================== STAFFS ======================\n" +
                 "{0,-25}{1,-30}{2,-30}{3,-25}\n", "ID", "NOMBRE", 
                 "APELLIDO", "TURNO");
-            foreach(Staff staff in staffs)
+            try
             {
-                texto += staff + "\n";
+                foreach (Staff staff in staffs)
+                {
+                    texto += staff + "\n";
+                }
+
+                return texto;
+            }
+            catch (System.NullReferenceException e)
+            {
+                return "\n %%% NO HAY STAFFS %%% \n";
             }
 
-            return texto;
         }
     }
 }

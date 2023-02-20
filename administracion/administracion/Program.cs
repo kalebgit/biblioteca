@@ -1,13 +1,15 @@
 ﻿using administracion.Handler;
 using administracion.Models;
+using System.Data;
 using System.Diagnostics;
 using System.Security.Cryptography;
 
 namespace administracion
 {
-    internal class Program
+    public class Program
     {
         public delegate T Ingreso<T>(string obj);
+        public delegate void ConsultaFecha(Prestamo prestamo);
         static void Main(string[] args)
         {
             // delegados para verificar tipos de datos
@@ -15,6 +17,7 @@ namespace administracion
             Ingreso<int> verificadorInt = new Ingreso<int>(IsInt);
             Ingreso<long> verificadorLong = new Ingreso<long>(IsLong);
             Ingreso<string> verificadorString = new Ingreso<string>(NonNullable);
+            
 
             // handlers
             LibroHandler libroHandler = new LibroHandler();
@@ -22,49 +25,11 @@ namespace administracion
             StaffHandler staffHandler = new StaffHandler();
             UsuarioHandler usuarioHandler = new UsuarioHandler();
 
-            // Pruebas
-            List<Usuario> usuarios = new List<Usuario>()
-            {
-                new Usuario(30001, "Emiliano", "Jimenez", 17, "emilianokaleb@gmail.com",
-                5644383186),
-                new Usuario(30002, "Andrea", "Gutierrez", 18, "andgu@gmail.com",
-                5644383186),
-                new Usuario(30003, "Ignacio", "Espinoza", 23, "igni@gmail.com",
-                5644383186),
-                new Usuario(30004, "Laura", "Flores", 22, "lau.flor@gmail.com",
-                5644383186),
-                new Usuario(30005, "Roberto", "Sanchez", 21, "sanrober@gmail.com",
-                5644383186)
+            ConsultaFecha consulta = new ConsultaFecha(prestamoHandler.ConsultarFecha);
 
-            };
-            List<Staff> staffs = new List<Staff>()
-            {
-                new Staff(40001, "Ingrid", "Nunez", "MATUTINO"),
-                new Staff(40002, "Ingrid", "Nunez", "VESPERTINO"),
-                new Staff(40003, "Ingrid", "Nunez", "NOCTURNO")
-
-            };
-            List<Libro> libros = new List<Libro>()
-            {
-                new Libro(70001, "Crimen y Castigo", "Fiodor", "Dostoyevski", "Porrua", "Novela",
-                10),
-                new Libro(70002, "Frankenstein", "Mary", "Shelley", "Austral", "Novela",
-                10),
-                new Libro(70003, "Calculo diferencial", "Samuel", "Fuenlabrada de la Vega",
-                "McGraw-Hill", "Ciencias Fisico Matematicas",
-                30),
-                new Libro(70004, "Dibujo constructivo", "Jany Edna", "Castellanos Lopez",
-                "McGraw-Hill", "Humanidades y Artes",
-                25),
-                new Libro(70005, "Conceptos de administracion estrategica", "Fred", "David",
-                "Pearson", "Ciencias Sociales",
-                15),
-                new Libro(70006, "Biologia", "Gama", "", "Pearson", "Ciencias Biologicas Quimicas" +
-                " y de la Salud",
-                40)
-            };
-
-            byte opcion;
+            DateTime date = new DateTime();
+            byte opcion, subopcion;
+            string atributo;
             do
             {
                 // titulo
@@ -92,7 +57,7 @@ namespace administracion
                         switch (verificadorByte(Console.ReadLine()))
                         {
                             case 1:
-                                
+
                                 Console.WriteLine("\n\n---- Crear Usuario ----\n" +
                                     "Escribe los siguientes datos:");
                                 Console.Write("Id: ");
@@ -117,18 +82,20 @@ namespace administracion
                                 Console.Write("\n\n---- Mostrar Usuario ----\n" +
                                     "\n1) Ver un usuario por su id" +
                                     "\n2) Ver todos los usuarios \n\nOpcion: ");
-                                if(verificadorByte(Console.ReadLine()) == 1)
+
+                                subopcion = verificadorByte(Console.ReadLine());
+                                if (subopcion == 1)
                                 {
                                     Console.Write("\n@@ opcion 1 @@\nUsuario: ");
                                     usuarioss.Add(usuarioHandler.Get(verificadorLong(Console.ReadLine())));
-                                    usuarioHandler.ImprimirUsuarios(usuarioss);
+                                    Console.WriteLine(usuarioHandler.ImprimirUsuarios(usuarioss));
                                     usuarioss.Clear();
                                 }
-                                else if(verificadorByte(Console.ReadLine()) == 2)
+                                else if (subopcion == 2)
                                 {
                                     Console.Write("\n@@ opcion 2 @@\n");
                                     usuarioss = usuarioHandler.GetAll();
-                                    usuarioHandler.ImprimirUsuarios(usuarioss);
+                                    Console.WriteLine(usuarioHandler.ImprimirUsuarios(usuarioss));
                                     usuarioss.Clear();
                                 }
                                 else
@@ -139,9 +106,15 @@ namespace administracion
                                 }
                                 break;
                             case 3:
-                                Console.Write("\n\n---- Actualizar Usuario ----\n" +
-                                    "Escribe el id del usuario que deseas actualizar:");
-                                usuario = usuarioHandler.Get(verificadorLong(Console.ReadLine()));
+                                Console.Write("\n\n---- Actualizar Usuario ----\n");
+                                do
+                                {
+                                    Console.Write("Escribe el id del usuario que deseas actualizar:");
+                                    usuario = usuarioHandler.Get(verificadorLong(Console.ReadLine()));
+                                    Console.Write(usuario == null ? "\n%% usuario no encontrado" +
+                                        "con el id %%\n" : "");
+                                } while (usuario == null);
+                                
                                 do
                                 {
                                     Console.Write("\n\nAhora escribe el atributo que quieres cambiar:" +
@@ -149,11 +122,12 @@ namespace administracion
                                     "\nAPELLIDO" +
                                     "\nEDAD" +
                                     "\nMAIL" +
-                                    "\nTELEFONO");
+                                    "\nTELEFONO\n\nAtributo:");
 
-                                    
-                                    switch (verificadorString(Console.ReadLine()))
+                                    atributo = verificadorString(Console.ReadLine());
+                                    switch (atributo)
                                     {
+                                        
                                         case "NOMBRE":
                                             Console.Write("\ningresa nuevo valor de Nombre: ");
                                             verificadorString = new Ingreso<string>(NonNullable);
@@ -179,9 +153,10 @@ namespace administracion
                                             usuario.Telefono = verificadorLong(Console.ReadLine());
                                             break;
                                         default:
-                                            continue;
+                                            Console.WriteLine("\n%% atributo incorrecto %%");
+                                            break;
                                     }
-                                    Console.WriteLine("\nQuieres cambiar otro atributo? si(1) no(0)");
+                                    Console.WriteLine("\nQuieres repetir la operacion? si(1) no(0)");
                                 } while (verificadorByte(Console.ReadLine()) != 0);
                                 usuarioHandler.Update(usuario);
                                 usuario = null;
@@ -243,18 +218,20 @@ namespace administracion
                                 Console.Write("\n\n---- Mostrar Libro ----\n" +
                                     "\n1) Ver un libro por su id" +
                                     "\n2) Ver todos los libros \n\nOpcion: ");
-                                if (verificadorByte(Console.ReadLine()) == 1)
+                                subopcion = verificadorByte(Console.ReadLine());
+
+                                if (subopcion == 1)
                                 {
                                     Console.Write("\n@@ opcion 1 @@\nLibro: ");
                                     libross.Add(libroHandler.Get(verificadorLong(Console.ReadLine())));
-                                    libroHandler.ImprimirLibros(libross);
+                                    Console.WriteLine(libroHandler.ImprimirLibros(libross));
                                     libross.Clear();
                                 }
-                                else if (verificadorByte(Console.ReadLine()) == 2)
+                                else if (subopcion == 2)
                                 {
                                     Console.Write("\n@@ opcion 2 @@\n");
                                     libross = libroHandler.GetAll();
-                                    libroHandler.ImprimirLibros(libross);
+                                    Console.WriteLine(libroHandler.ImprimirLibros(libross));
                                     libross.Clear();
                                 }
                                 else
@@ -265,9 +242,14 @@ namespace administracion
                                 }
                                 break;
                             case 3:
-                                Console.Write("\n\n---- Actualizar Libro ----\n" +
-                                    "Escribe el id del libro que deseas actualizar:");
-                                libro = libroHandler.Get(verificadorLong(Console.ReadLine()));
+                                Console.Write("\n\n---- Actualizar Libro ----\n");
+                                do
+                                {
+                                    Console.Write("Escribe el id del libro que deseas actualizar:");
+                                    libro = libroHandler.Get(verificadorLong(Console.ReadLine()));
+                                    Console.WriteLine(libro == null ? "\n%% libro no encontrado" +
+                                        "con el id %%\n" : "");
+                                } while (libro == null);
                                 do
                                 {
                                     Console.Write("\n\nAhora escribe el atributo que quieres cambiar:" +
@@ -276,9 +258,11 @@ namespace administracion
                                     "\nAPELLIDO AUTOR" +
                                     "\nEDITORIAL" +
                                     "\nSECCION" +
-                                    "\nCANTIDAD");
+                                    "\nCANTIDAD \n\nAtributo:");
 
-                                    switch (verificadorString(Console.ReadLine()))
+                                    atributo = verificadorString(Console.ReadLine());
+
+                                    switch (atributo)
                                     {
                                         case "TITULO":
                                             Console.Write("\ningresa nuevo valor de Titulo: ");
@@ -362,18 +346,20 @@ namespace administracion
                                 Console.Write("\n\n---- Mostrar Staff ----\n" +
                                     "\n1) Ver un staff por su id" +
                                     "\n2) Ver todos los staffs \n\nOpcion: ");
-                                if (verificadorByte(Console.ReadLine()) == 1)
+                                subopcion = verificadorByte(Console.ReadLine());
+
+                                if (subopcion == 1)
                                 {
                                     Console.Write("\n@@ opcion 1 @@\nStaff: ");
                                     staffss.Add(staffHandler.Get(verificadorLong(Console.ReadLine())));
-                                    staffHandler.ImprimirStaffs(staffss);
+                                    Console.WriteLine(staffHandler.ImprimirStaffs(staffss));
                                     staffss.Clear();
                                 }
-                                else if (verificadorByte(Console.ReadLine()) == 2)
+                                else if (subopcion == 2)
                                 {
                                     Console.Write("\n@@ opcion 2 @@\n");
                                     staffss = staffHandler.GetAll();
-                                    staffHandler.ImprimirStaffs(staffss);
+                                    Console.WriteLine(staffHandler.ImprimirStaffs(staffss));
                                     staffss.Clear();
                                 }
                                 else
@@ -384,15 +370,20 @@ namespace administracion
                                 }
                                 break;
                             case 3:
-                                Console.Write("\n\n---- Actualizar Staff ----\n" +
-                                    "Escribe el id del staff que deseas actualizar:");
-                                staff = staffHandler.Get(verificadorLong(Console.ReadLine()));
+                                Console.Write("\n\n---- Actualizar Staff ----\n");
+                                do
+                                {
+                                    Console.Write("Escribe el id del staff que deseas actualizar:");
+                                    staff = staffHandler.Get(verificadorLong(Console.ReadLine()));
+                                    Console.WriteLine(staff == null ? "\n%% staff no encontrado" +
+                                        "con el id %%\n" : "");
+                                } while (staff == null);
                                 do
                                 {
                                     Console.Write("\n\nAhora escribe el atributo que quieres cambiar:" +
                                     "\nNOMBRE" +
                                     "\nAPELLIDO" +
-                                    "\nTURNO");
+                                    "\nTURNO \n\nAtributo:");
 
                                     switch (verificadorString(Console.ReadLine()))
                                     {
@@ -457,39 +448,58 @@ namespace administracion
                                 {
                                     Console.Write("Id de Usuario: ");
                                     usuario = usuarioHandler.Get(verificadorLong(Console.ReadLine()));
+                                    Console.WriteLine(usuario == null ? "%% usuario no encontrado" +
+                                            ", intentalo de nuevo %%" : "");
+                                } while (usuario == null);
+                                
+                                do
+                                {
                                     Console.Write("Id de Libro: ");
                                     libro = libroHandler.Get(verificadorLong(Console.ReadLine()));
+                                    Console.WriteLine(libro == null ? "%% libro no encontrado" +
+                                        ", intentalo de nuevo %%" : "");
+                                } while(libro == null);
+                                    
+                                
+                                do
+                                {
                                     Console.Write("Id de Staff encargado: ");
                                     staff = staffHandler.Get(verificadorLong(Console.ReadLine()));
-                                    
-                                } while (usuario == null || staff == null || libro == null);
+                                    Console.WriteLine(staff == null ? "%% staff no encontrado" +
+                                        ", intentalo de nuevo %%" : "");
+                                } while (staff == null);
+
+                                string fechaPrestamo, fechaPrestamoCorrecta, fechaDevolucion,
+                                    fechaDevolucionCorrecta;
 
                                 do
                                 {
+                                    date = DateTime.Today
+                                    dia1 = date.Day;
+                                    mes1 = date.Month;
+                                    anio1 = date.Year;
+                                    fechaPrestamo = "" + mes1 + "/" + dia1 + "/" + anio1;
+                                } while (!IsFecha(fechaPrestamo, out fechaPrestamo));
+                                
+                                dia2 = dia1 + 3;
+                                
+                                if (dia2 > GetDiaMes(mes1, anio1))
+                                {
+                                    dia2 -= GetDiaMes(mes1, anio1);
+                                    mes1++;
+                                }
+                                
+                                mes2 = mes1;
+                                
+                                if (mes2 > 12)
+                                {
+                                    mes2 = 1;
+                                    anio1++;
+                                }
+                                anio2 = anio1;
+                                
+                                fechaDevolucion = "" + mes2 + "/" + dia2 + "/" + anio2;
 
-                                    Console.Write("\nFecha Prestamo: \nDia: ");
-                                    dia1 = verificadorInt(Console.ReadLine());
-                                    Console.Write("\nMes: ");
-                                    mes1 = verificadorInt(Console.ReadLine());
-                                    Console.Write("\nAnio: ");
-                                    anio1 = verificadorInt(Console.ReadLine());
-
-
-                                    Console.Write("\nFecha Devolucion: \nDia");
-                                    dia2 = verificadorInt(Console.ReadLine());
-                                    Console.Write("\nMes: ");
-                                    mes2 = verificadorInt(Console.ReadLine());
-                                    Console.Write("\nAnio: ");
-                                    anio2 = verificadorInt(Console.ReadLine());
-
-                                    Console.WriteLine(!(dia2 > dia1 || mes2 > mes1 || anio2 > anio1) ?
-                                        "%%%%%%%%%%%% La fecha de devolucion debe ser posterior " +
-                                        "al prestamo %%%%%%%%%%%%" :
-                                        "");
-                                } while (!(dia2 > dia1 || mes2 > mes1 || anio2 > anio1));
-
-                                string fechaPrestamo = "" + mes1 + "/" + dia1 + "/" + anio1;
-                                string fechaDevolucion = "" + mes2 + "/" + dia2 + "/" + anio2;
 
                                 prestamo = new Prestamo(usuario, libro, staff, fechaPrestamo,
                                     fechaDevolucion, "PRESTAMO");
@@ -499,23 +509,32 @@ namespace administracion
                                 usuario = null;
                                 libro = null;
                                 staff = null;
+
                                 break;
                             case 2:
                                 Console.Write("\n\n---- Mostrar Prestamo ----\n" +
                                     "\n1) Ver un prestamo por su id" +
                                     "\n2) Ver todos los prestamos \n\nOpcion: ");
-                                if (verificadorByte(Console.ReadLine()) == 1)
+                                
+                                foreach(Prestamo prestamo in prestamoHandler.GetAll())
+                                {
+                                    consulta(prestamo);
+                                }
+
+                                subopcion = verificadorByte(Console.ReadLine());
+
+                                if (subopcion == 1)
                                 {
                                     Console.Write("\n@@ opcion 1 @@\nPrestamo: ");
                                     prestamos.Add(prestamoHandler.Get(verificadorLong(Console.ReadLine())));
-                                    prestamoHandler.ImprimirPrestamos(prestamos);
+                                    Console.WriteLine(prestamoHandler.ImprimirPrestamos(prestamos));
                                     prestamos.Clear();
                                 }
-                                else if (verificadorByte(Console.ReadLine()) == 2)
+                                else if (subopcion == 2)
                                 {
                                     Console.Write("\n@@ opcion 2 @@\n");
                                     prestamos = prestamoHandler.GetAll();
-                                    prestamoHandler.ImprimirPrestamos(prestamos);
+                                    Console.WriteLine(prestamoHandler.ImprimirPrestamos(prestamos));
                                     prestamos.Clear();
                                 }
                                 else
@@ -525,27 +544,36 @@ namespace administracion
                                     continue;
                                 }
                                 break;
-                            case 3:
-                                Console.Write("\n\n---- Actualizar Prestamo (solo el estatus) ----\n" +
-                                    "Escribe el id del usuario asociado que deseas actualizar:");
-                                prestamos = prestamoHandler.GetPrestamos(verificadorLong(Console.ReadLine()));
-                                prestamoHandler.ImprimirPrestamos(prestamos);
 
-                                Console.Write("\nAhora ingresa el id del libro asociado" +
-                                    "al prestamo \nId del libro: ");
-                                long idLibro = verificadorLong(Console.ReadLine());
-                                prestamo = null;
-                                foreach(Prestamo prestamo1 in prestamos)
+                            case 3:
+                                Console.Write("\n\n---- Actualizar Prestamo (solo el estatus) ----\n");
+                                do
                                 {
-                                    if (prestamo1.IdLibro == idLibro)
-                                        prestamo = prestamo1;
-                                    
-                                }
-                                if (prestamo != null)
-                                    prestamoHandler.Update(prestamo);
-                                else
-                                    Console.WriteLine("\n%% no se pudo actualizar porque no se " +
-                                        "encontro con ese id %%\n");
+                                    Console.Write("Escribe el id del usuario asociado a un prestamo\nId del" +
+                                        " usuario: ");
+                                    prestamos = prestamoHandler.GetPrestamos(verificadorLong(Console.ReadLine()));
+                                    prestamoHandler.ImprimirPrestamos(prestamos);
+                                    Console.WriteLine(prestamos.Count == 0 ? "\n%% No se encontraron prestamos" +
+                                        " asociados a ese usuario, vuelve a intentarlo %%\n" : "");
+                                } while (prestamos.Count == 0);
+                                do
+                                {
+                                    Console.Write("\nAhora ingresa el id del libro asociado" +
+                                    "al prestamo \nId del libro: ");
+                                    long idLibro = verificadorLong(Console.ReadLine());
+
+                                    prestamo = null;
+                                    foreach (Prestamo prestamo1 in prestamos)
+                                    {
+                                        if (prestamo1.IdLibro == idLibro)
+                                            prestamo = prestamo1;
+
+                                    }
+                                    Console.WriteLine(prestamo == null ? "\n%% no se pudo " +
+                                        "encontrar un prestamo con ese id de libro, vuelve a " +
+                                        "intentarlo%%\n" : "");
+                                } while (prestamo == null);
+                                
                                 staff = null;
                                 break;
                             case 11:
@@ -660,7 +688,7 @@ namespace administracion
                     {
                         if (progreso == 0)
                         {
-                            if (!(int.TryParse(StringDerivado(obj, flag, i), out dia)))
+                            if (!(int.TryParse(StringDerivado(obj, flag, i), out mes)))
                             {
                                 salida = null;
                                 return false;
@@ -670,7 +698,7 @@ namespace administracion
                         }
                         else if (progreso == 1)
                         {
-                            if (!(int.TryParse(StringDerivado(obj, flag, i), out mes)))
+                            if (!(int.TryParse(StringDerivado(obj, flag, i), out dia)))
                             {
                                 salida = null;
                                 return false;
@@ -700,8 +728,7 @@ namespace administracion
                 return false;
             }
 
-            if (mes == 2 && dia == (int)Meses.FebreroB && !(anio % 400 == 0 ? true :
-                (anio % 4 == 0 ? (anio % 100 == 0 ? false : true) : false)))
+            if (mes == 2 && dia == (int)Meses.FebreroB && !EsBisiesto(anio))
             {
                 salida = null;
                 return false;
@@ -771,11 +798,55 @@ namespace administracion
                         break;
             }
 
-            salida = "" + dia + "/" + mes + "/" + anio;
+            salida = "" + mes + "/" + dia + "/" + anio;
 
             return true;
         }
+        
+        public static int GetDiaMes(int mes, int anio)
+        {
+            switch (mes)
+            {
+                case 1:
+                    return (int)Meses.Enero;
+                case 2:
+                    return EsBisiesto(anio) ? (int)Meses.FebreroB : (int)Meses.Febrero;
+                case 3:
+                    return (int)Meses.Marzo;
+                case 4:
+                    return (int)Meses.Abril;
+                case 5:
+                    return (int)Meses.Mayo;
+                case 6:
+                    return (int)Meses.Junio;
+                case 7:
+                    return (int)Meses.Julio;
+                case 8:
+                    return (int)Meses.Agosto;
+                case 9:
+                    return (int)Meses.Septiembre;
+                case 10:
+                    return (int)Meses.Octubre;
+                case 11:
+                    return (int)Meses.Noviembre;
+                case 12:
+                    return (int)Meses.Diciembre;
+                default:
+                    return 0;
 
+            }
+        }
+
+        public static bool EsBisiesto(int anio)
+        {
+            if(anio % 400 == 0 ? true :
+                (anio % 4 == 0 ? (anio % 100 == 0 ? false : true) : false))
+            {
+                return true;
+            }
+            return false;
+
+        }
         public static string StringDerivado(string texto, int startIndex, int endIndex)
         {
             string derivado = "";

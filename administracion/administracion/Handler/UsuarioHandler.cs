@@ -50,11 +50,18 @@ namespace administracion.Handler
             string texto = String.Format("=================== USUARIOS ======================\n" +
                 "{0,-25}{1,-30}{2,-30}{3,-10}{4,-30}{5,-30}\n", "ID", "NOMBRE",
                 "APELLIDO", "EDAD", "EMAIL", "TELEFONO");
-            foreach (Usuario usuario in usuarios)
+            try
             {
-                texto += usuario + "\n";
+                foreach (Usuario usuario in usuarios)
+                {
+                    texto += usuario + "\n";
+                }
+                return texto;
             }
-            return texto;
+            catch (System.NullReferenceException e)
+            {
+                return "\n %%% NO HAY USUARIOS %%% \n";
+            }
         }
     }
 }

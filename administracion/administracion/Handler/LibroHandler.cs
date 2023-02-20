@@ -51,11 +51,18 @@ namespace administracion.Handler
             string texto = String.Format("=================== LIBROS ======================\n" +
                 "{0,-25}{1,-50}{2,-30}{3,-30}{4,-30}{5,-30}{6,-20}\n", "ID", "TITULO",
                 "NOMBRE_AUTOR", "APELLIDO_AUTOR", "EDITORIAL", "SECCION", "CANTIDAD");
-            foreach (Libro libro in libros)
+            try
             {
-                texto += libro + "\n";
+                foreach (Libro libro in libros)
+                {
+                    texto += libro + "\n";
+                }
+                return texto;
             }
-            return texto;
+            catch (System.NullReferenceException e)
+            {
+                return "\n %%% NO HAY LIBROS %%% \n";
+            }
         }
 
     }
