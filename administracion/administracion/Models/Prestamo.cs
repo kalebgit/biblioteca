@@ -40,6 +40,10 @@ namespace administracion.Models
             Estatus = estatus;
         }
 
+        public Prestamo()
+        {
+
+        }
         public override string ToString()
         {
             return String.Format("{0,-30}{1,-30}{2,-30}{3,-30}{4,-30}{5,-30}",

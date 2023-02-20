@@ -102,10 +102,7 @@ namespace administracion.Handler
                 {
                     if (dataReader.HasRows)
                     {
-                        while (dataReader.Read())
-                        {
-                            list = CreateObjects(dataReader);
-                        }
+                        list = CreateObjects(dataReader);
                         return list;
                     }
                 }

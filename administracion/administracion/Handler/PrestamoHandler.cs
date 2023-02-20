@@ -74,6 +74,26 @@ namespace administracion.Handler
             }
         }
 
+        public List<Prestamo> GetPrestamos(long id)
+        {
+            List<Prestamo> prestamos = new List<Prestamo>();
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                connection.Open();
+                SqlCommand command = new SqlCommand($"SELECT * FROM {GetTabla()} WHERE" +
+                    $" ID_USUARIO = {id}", connection);
+                using (SqlDataReader dataReader = command.ExecuteReader())
+                {
+                    if (dataReader.HasRows)
+                    {
+                        prestamos = CreateObjects(dataReader);
+                        return prestamos;
+                    }
+                }
+            }
+            return null;
+        }
+
         public void UpdateCantidad(Prestamo prestamo)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))

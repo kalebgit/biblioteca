@@ -22,7 +22,10 @@ namespace administracion.Models
             Apellido = apellido;
             Turno = turno;
         }
+        public Staff()
+        {
 
+        }
         public override string ToString()
         {
             return String.Format("{0,-25}{1,-30}{2,-30}{3,-25}", Id, Nombre, Apellido, Turno);

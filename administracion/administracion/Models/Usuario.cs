@@ -28,6 +28,10 @@ namespace administracion.Models
             Telefono = telefono;
         }
 
+        public Usuario()
+        {
+
+        }
         public override string ToString()
         {
             return String.Format("{0,-25}{1,-30}{2,-30}{3,-10}{4,-30}{5,-30}", Id,
